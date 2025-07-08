@@ -1,0 +1,49 @@
+import sqlite3
+import os
+import pickle
+from flask import Flask, request
+
+app = Flask(__name__)
+
+# Unsafe: SQL Injection
+def get_user_info(username):
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    query = "SELECT * FROM users WHERE username = '%s'" % username
+    cursor.execute(query)
+    return cursor.fetchall()
+
+# Unsafe: Command Injection
+def list_directory(path):
+    return os.popen("ls " + path).read()
+
+# Unsafe: Eval usage
+def calculate(expression):
+    return eval(expression)
+
+# Unsafe: Insecure Deserialization
+def load_user_session(data):
+    return pickle.loads(data)
+
+@app.route('/user')
+def user():
+    username = request.args.get('username')
+    return str(get_user_info(username))
+
+@app.route('/list')
+def list_dir():
+    path = request.args.get('path')
+    return list_directory(path)
+
+@app.route('/calc')
+def calc():
+    expression = request.args.get('expr')
+    return str(calculate(expression))
+
+@app.route('/load')
+def load():
+    data = request.args.get('data')
+    return str(load_user_session(bytes.fromhex(data)))
+
+if __name__ == '__main__':
+    app.run(debug=True)
