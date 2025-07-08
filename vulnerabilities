@@ -1,22 +1,22 @@
 import os
 import pickle
 
-# 1. Hardcoded credentials (vulnerability)
+
 USERNAME = "admin"
 PASSWORD = "123456"
 
 def authenticate(user, pwd):
     return user == USERNAME and pwd == PASSWORD
 
-# 2. Command injection vulnerability
+
 def list_directory(path):
     os.system(f"ls {path}")
 
-# 3. Insecure deserialization vulnerability
+
 def load_user_data(serialized_data):
     return pickle.loads(serialized_data)
 
-# Example usage
+
 if __name__ == "__main__":
     user = input("Username: ")
     pwd = input("Password: ")
